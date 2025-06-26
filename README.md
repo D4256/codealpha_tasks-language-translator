@@ -65,9 +65,8 @@
   </div>
 
   <script>
-    const subscriptionKey = "YOUR_API_KEY";  // Replace with your key
-    const endpoint = "https://api.cognitive.microsofttranslator.com";  // Default endpoint
-    const region = "YOUR_REGION";  // e.g., centralindia
+    const endpoint = "https://api.cognitive.microsofttranslator.com";  
+    const region = "YOUR_REGION";  
 
     async function translateText() {
       const text = document.getElementById("inputText").value;
