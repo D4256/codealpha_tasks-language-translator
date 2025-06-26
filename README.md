@@ -69,7 +69,7 @@
       }
 
       try {
-        const response = await fetch("https://libretranslate.de/translate", {
+        const response = await fetch("https://translation.googleapis.com", {
           method: "POST",
           body: JSON.stringify({
             q: text,
