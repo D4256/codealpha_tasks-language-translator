@@ -69,7 +69,7 @@
       }
 
       try {
-        const response = await fetch("https://translation.googleapis.com", {
+        const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${apiKey}`, {
           method: "POST",
           body: JSON.stringify({
             q: text,
