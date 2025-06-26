@@ -69,7 +69,7 @@
       }
 
       try {
-        const response = await fetch https:api.mymemory.translated.net/get?q=${text}&langpair=${translateFrom}|${translateTo};
+        const response = await fetch 
 {
           method: "POST",
           body: JSON.stringify({
