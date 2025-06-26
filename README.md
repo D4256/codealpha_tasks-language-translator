@@ -3,122 +3,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Language Translator</title>
+  <title>Microsoft Translator - Free Version</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      margin: auto;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 10px #aaa;
+      border-radius: 10px;
+    }
     textarea {
-      width: 300px;
+      width: 100%;
       height: 100px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    select, button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    #translatedOutput {
+      background-color: #f0f0f0;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h2>Language Translator Tool</h2>
+  <div class="container">
+    <h2>🌐 Microsoft Translator Tool (Free API)</h2>
 
-  <label for="inputText">Enter Text:</label><br>
-  <textarea id="inputText" placeholder="Enter text here..."></textarea><br><br>
+    <textarea id="inputText" placeholder="Enter text here..."></textarea><br>
 
-  <label for="sourceLang">From:</label>
-  <select id="sourceLang">
-    <option value="en">English</option>
-    <option value="hi">Hindi</option>
-    <option value="es">Spanish</option>
-    <option value="fr">French</option>
-    <option value="de">German</option>
-    <option value="zh">Chinese</option>
-  </select>
+    <label for="targetLang">To:</label>
+    <select id="targetLang">
+      <option value="hi">Hindi</option>
+      <option value="en">English</option>
+      <option value="fr">French</option>
+      <option value="es">Spanish</option>
+      <option value="de">German</option>
+    </select>
 
-  <label for="targetLang">To:</label>
-  <select id="targetLang">
-    <option value="hi">Hindi</option>
-    <option value="en">English</option>
-    <option value="es">Spanish</option>
-    <option value="fr">French</option>
-    <option value="de">German</option>
-    <option value="zh">Chinese</option>
-  </select>
+    <button onclick="translateText()">Translate</button>
 
-  <br><br>
-  <button onclick="translateText()">Translate</button>
-  <button onclick="copyText()">Copy</button>
-  <button onclick="speak()">Speak</button>
+    <h3>Translated Text:</h3>
+    <p id="translatedOutput"></p>
 
-  <p><strong>Translated Text:</strong></p>
-  <p id="translatedOutput"></p>
+    <button onclick="copyText()">📋 Copy</button>
+    <button onclick="speak()">🔊 Speak</button>
+  </div>
 
   <script>
-    let voices = [];
-
-    // Load voices for speech synthesis
-    window.speechSynthesis.onvoiceschanged = () => {
-      voices = window.speechSynthesis.getVoices();
-    };
+    const subscriptionKey = "YOUR_API_KEY";  // Replace with your key
+    const endpoint = "https://api.cognitive.microsofttranslator.com";  // Default endpoint
+    const region = "YOUR_REGION";  // e.g., centralindia
 
     async function translateText() {
-      const text = document.getElementById("inputText").value.trim();
-      const source = document.getElementById("sourceLang").value;
+      const text = document.getElementById("inputText").value;
       const target = document.getElementById("targetLang").value;
 
-      if (!text) {
-        alert("Please enter some text to translate.");
-        return;
-      }
-
-      if (source === target) {
-        alert("Source and target languages must be different.");
+      if (!text.trim()) {
+        alert("Please enter some text.");
         return;
       }
 
       try {
-        const response = await fetch 
-{
+        const response = await fetch(`${endpoint}/translate?api-version=3.0&to=${target}`, {
           method: "POST",
-          body: JSON.stringify({
-            q: text,
-            source: source,
-            target: target,
-            format: "text"
-          }),
-          headers: { "Content-Type": "application/json" }
+          headers: {
+            "Ocp-Apim-Subscription-Key": subscriptionKey,
+            "Ocp-Apim-Subscription-Region": region,
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify([{ Text: text }])
         });
 
-        const data = await response.json();
-        document.getElementById("translatedOutput").innerText = data.translatedText;
+        const result = await response.json();
+        document.getElementById("translatedOutput").innerText = result[0].translations[0].text;
       } catch (error) {
-        console.error("Translation Error:", error);
-        alert("Failed to translate. Please check your network or try again later.");
+        console.error("Error:", error);
+        document.getElementById("translatedOutput").innerText = "Translation failed.";
       }
     }
 
     function copyText() {
       const text = document.getElementById("translatedOutput").innerText;
-      if (!text) {
-        alert("Nothing to copy.");
-        return;
+      if (text) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert("Copied to clipboard!");
+        });
       }
-
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Copied to clipboard!");
-      });
     }
 
     function speak() {
       const text = document.getElementById("translatedOutput").innerText;
-      const target = document.getElementById("targetLang").value;
-
-      if (!text) {
-        alert("Please translate something first!");
-        return;
+      if (text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
       }
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = target;
-
-      const matchingVoice = voices.find(v => v.lang.startsWith(target));
-      if (matchingVoice) {
-        utterance.voice = matchingVoice;
-      }
-
-      window.speechSynthesis.speak(utterance);
     }
   </script>
 </body>
